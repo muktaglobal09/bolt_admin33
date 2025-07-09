@@ -1,0 +1,18 @@
+/* Modern, larger, and clearer color picker for django-colorfield */
+.colorfield-field input[type="color"] {
+    width: 40px !important;
+    height: 40px !important;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    margin-right: 10px;
+    vertical-align: middle;
+    box-shadow: 0 1px 2px rgba(60,72,88,0.04);
+    cursor: pointer;
+    transition: border 0.2s;
+}
+
+.colorfield-field input[type="color"]:focus {
+    border: 2px solid #38b2ac;
+    outline: none;
+}

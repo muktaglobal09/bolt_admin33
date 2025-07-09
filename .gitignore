@@ -1,0 +1,26 @@
+# Ignore backup and zip folders
+searchhin_web_backup/
+*.zip
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code settings
+.vscode/
+
+# Environment
+.env
+.env.local
+
+# Django-specific
+db.sqlite3
+media/
+staticfiles/
+
+# Ignore node_modules (if frontend involved)
+node_modules/
+build/
+dist/

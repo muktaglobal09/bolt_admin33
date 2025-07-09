@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}
+{% endblock %}
+
+{% block branding %}
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">{{ site_header|default:_('Searchh Administration') }}</a>
+  </h1>
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
+{% endblock %}
+
+{% block nav-global %}
+  <!-- Remove duplicate global navigation -->
+{% endblock %}
+
+{% block nav-sidebar %}
+  {{ block.super }}
+{% endblock %}

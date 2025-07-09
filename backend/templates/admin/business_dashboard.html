@@ -1,0 +1,335 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Business Dashboard{% endblock %}
+
+{% block extrahead %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.dashboard-widget {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stat-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.health-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+}
+
+.health-excellent { background-color: #28a745; }
+.health-good { background-color: #20c997; }
+.health-average { background-color: #ffc107; color: #000; }
+.health-poor { background-color: #fd7e14; }
+.health-critical { background-color: #dc3545; }
+
+.verification-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: white;
+}
+
+.verification-verified { background-color: #28a745; }
+.verification-pending { background-color: #ffc107; color: #000; }
+.verification-rejected { background-color: #dc3545; }
+.verification-suspended { background-color: #6c757d; }
+
+.business-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.business-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.business-item:last-child {
+    border-bottom: none;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 20px 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Business Dashboard</h1>
+    
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_businesses }}</div>
+                <div class="stat-label">Total Businesses</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.verified_businesses }}</div>
+                <div class="stat-label">Verified Businesses</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.featured_businesses }}</div>
+                <div class="stat-label">Featured Businesses</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.verification_rate }}%</div>
+                <div class="stat-label">Verification Rate</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Today's Activity -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.today_views }}</div>
+                <div class="stat-label">Today's Views</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.today_leads }}</div>
+                <div class="stat-label">Today's Leads</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.today_conversions }}</div>
+                <div class="stat-label">Today's Conversions</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="dashboard-widget">
+                <h3>Analytics Trends (Last 30 Days)</h3>
+                <div class="chart-container">
+                    <canvas id="analyticsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Business Lists -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="dashboard-widget">
+                <h3>Recent Businesses</h3>
+                <div class="business-list">
+                    {% for business in recent_businesses %}
+                    <div class="business-item">
+                        <div>
+                            <strong>{{ business.name }}</strong><br>
+                            <small>{{ business.category.name }} • {{ business.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div>
+                            <span class="verification-badge verification-{{ business.verification_status }}">
+                                {{ business.get_verification_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="dashboard-widget">
+                <h3>Top Performing</h3>
+                <div class="business-list">
+                    {% for business in top_businesses %}
+                    <div class="business-item">
+                        <div>
+                            <strong>{{ business.name }}</strong><br>
+                            <small>{{ business.view_count }} views • {{ business.lead_count }} leads</small>
+                        </div>
+                        <div>
+                            <span class="health-badge health-{{ business.health_status }}">
+                                {{ business.get_health_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="dashboard-widget">
+                <h3>Needs Attention</h3>
+                <div class="business-list">
+                    {% for business in attention_businesses %}
+                    <div class="business-item">
+                        <div>
+                            <strong>{{ business.name }}</strong><br>
+                            <small>{{ business.profile_completeness }}% complete</small>
+                        </div>
+                        <div>
+                            <span class="health-badge health-{{ business.health_status }}">
+                                {{ business.get_health_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Health and Verification Distribution -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-widget">
+                <h3>Health Status Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="healthChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="dashboard-widget">
+                <h3>Verification Status Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="verificationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Analytics Trends Chart
+const analyticsCtx = document.getElementById('analyticsChart').getContext('2d');
+new Chart(analyticsCtx, {
+    type: 'line',
+    data: {
+        labels: {{ chart_data.dates|safe }},
+        datasets: [{
+            label: 'Views',
+            data: {{ chart_data.views|safe }},
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }, {
+            label: 'Leads',
+            data: {{ chart_data.leads|safe }},
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            tension: 0.1
+        }, {
+            label: 'Conversions',
+            data: {{ chart_data.conversions|safe }},
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Health Status Chart
+const healthCtx = document.getElementById('healthChart').getContext('2d');
+new Chart(healthCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for item in stats.health_distribution %}
+            '{{ item.health_status|title }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for item in stats.health_distribution %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#28a745', '#20c997', '#ffc107', '#fd7e14', '#dc3545'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+// Verification Status Chart
+const verificationCtx = document.getElementById('verificationChart').getContext('2d');
+new Chart(verificationCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for item in stats.verification_distribution %}
+            '{{ item.verification_status|title }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for item in stats.verification_distribution %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#28a745', '#ffc107', '#dc3545', '#6c757d'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+{% endblock %}
