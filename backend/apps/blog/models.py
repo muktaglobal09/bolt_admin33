@@ -10,11 +10,11 @@ User = get_user_model()
 class BlogCategory(TimeStampedModel, SEOModel):
     """Categories for blog posts."""
     
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='blog/categories/', blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-    sort_order = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=100, unique=True, help_text="Category name (must be unique)")
+    description = models.TextField(blank=True, help_text="Description of the blog category")
+    image = models.ImageField(upload_to='blog/categories/', blank=True, null=True, help_text="Category featured image")
+    is_active = models.BooleanField(default=True, help_text="Whether this category is active and visible")
+    sort_order = models.PositiveIntegerField(default=0, help_text="Order for displaying categories")
     
     class Meta:
         verbose_name = 'Blog Category'
@@ -39,28 +39,28 @@ class BlogPost(TimeStampedModel, SEOModel):
     )
     
     # Basic Information
-    title = models.CharField(max_length=200)
-    excerpt = models.TextField(max_length=300, help_text="Short description for previews")
-    content = RichTextUploadingField()
+    title = models.CharField(max_length=200, help_text="Blog post title")
+    excerpt = models.TextField(max_length=300, help_text="Short description for previews and social media")
+    content = RichTextUploadingField(help_text="Full blog post content with rich text formatting")
     
     # Publishing
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
-    category = models.ForeignKey(BlogCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
-    is_published = models.BooleanField(default=False)
-    published_at = models.DateTimeField(null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts', help_text="Author of the blog post")
+    category = models.ForeignKey(BlogCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts', help_text="Blog category")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', help_text="Publication status")
+    is_published = models.BooleanField(default=False, help_text="Whether the post is published and visible")
+    published_at = models.DateTimeField(null=True, blank=True, help_text="Date and time when post was published")
     
     # Media
-    featured_image = models.ImageField(upload_to='blog/posts/', blank=True, null=True)
-    featured_image_alt = models.CharField(max_length=255, blank=True)
+    featured_image = models.ImageField(upload_to='blog/posts/', blank=True, null=True, help_text="Featured image for the blog post")
+    featured_image_alt = models.CharField(max_length=255, blank=True, help_text="Alt text for featured image (for accessibility)")
     
     # Engagement
-    is_featured = models.BooleanField(default=False)
-    allow_comments = models.BooleanField(default=True)
-    view_count = models.PositiveIntegerField(default=0)
+    is_featured = models.BooleanField(default=False, help_text="Featured posts appear prominently on the blog")
+    allow_comments = models.BooleanField(default=True, help_text="Whether comments are allowed on this post")
+    view_count = models.PositiveIntegerField(default=0, help_text="Number of times this post has been viewed")
     
     # Tags
-    tags = TaggableManager(blank=True)
+    tags = TaggableManager(blank=True, help_text="Tags for categorizing and finding related posts")
     
     class Meta:
         verbose_name = 'Blog Post'

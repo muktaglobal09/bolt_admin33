@@ -31,26 +31,26 @@ class SubscriptionPlan(TimeStampedModel):
     billing_cycle = models.CharField(max_length=20, choices=BILLING_CYCLES, default='monthly')
     
     # Features
-    max_business_listings = models.PositiveIntegerField(default=1)
-    max_images_per_business = models.PositiveIntegerField(default=5)
-    max_services_per_business = models.PositiveIntegerField(default=10)
-    max_products_per_business = models.PositiveIntegerField(default=10)
+    max_business_listings = models.PositiveIntegerField(default=1, help_text="Maximum number of business listings allowed")
+    max_images_per_business = models.PositiveIntegerField(default=5, help_text="Maximum images per business listing")
+    max_services_per_business = models.PositiveIntegerField(default=10, help_text="Maximum services per business")
+    max_products_per_business = models.PositiveIntegerField(default=10, help_text="Maximum products per business")
     
     # Lead features
-    monthly_lead_credits = models.PositiveIntegerField(default=0)
-    lead_purchase_discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    monthly_lead_credits = models.PositiveIntegerField(default=0, help_text="Number of lead credits included per month")
+    lead_purchase_discount = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text="Discount percentage on additional lead purchases")
     
     # Additional features
-    priority_listing = models.BooleanField(default=False)
-    featured_listing = models.BooleanField(default=False)
-    analytics_access = models.BooleanField(default=False)
-    crm_access = models.BooleanField(default=False)
-    api_access = models.BooleanField(default=False)
-    custom_branding = models.BooleanField(default=False)
-    dedicated_support = models.BooleanField(default=False)
+    priority_listing = models.BooleanField(default=False, help_text="Higher ranking in search results")
+    featured_listing = models.BooleanField(default=False, help_text="Featured placement in category listings")
+    analytics_access = models.BooleanField(default=False, help_text="Access to detailed analytics dashboard")
+    crm_access = models.BooleanField(default=False, help_text="Access to CRM features")
+    api_access = models.BooleanField(default=False, help_text="API access for integrations")
+    custom_branding = models.BooleanField(default=False, help_text="Custom branding options")
+    dedicated_support = models.BooleanField(default=False, help_text="Dedicated customer support")
     
-    is_active = models.BooleanField(default=True)
-    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True, help_text="Whether this plan is available for purchase")
+    sort_order = models.PositiveIntegerField(default=0, help_text="Order for displaying plans (lower numbers first)")
     
     class Meta:
         verbose_name = 'Subscription Plan'

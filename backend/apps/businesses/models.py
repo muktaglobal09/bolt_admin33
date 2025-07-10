@@ -43,76 +43,76 @@ class Business(TimeStampedModel, AddressModel, SEOModel):
     )
     
     # Basic Information
-    name = models.CharField(max_length=200)
-    description = models.TextField()
-    short_description = models.CharField(max_length=255, blank=True)
-    business_type = models.CharField(max_length=20, choices=BUSINESS_TYPES)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='businesses')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='businesses')
+    name = models.CharField(max_length=200, help_text="Business name as it should appear publicly")
+    description = models.TextField(help_text="Detailed description of the business, services, and offerings")
+    short_description = models.CharField(max_length=255, blank=True, help_text="Brief one-line description for listings and previews")
+    business_type = models.CharField(max_length=20, choices=BUSINESS_TYPES, help_text="Primary type of business operation")
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='businesses', help_text="Primary business category")
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='businesses', help_text="User who owns and manages this business")
     
     # Contact Information
-    phone_number = PhoneNumberField()
-    alternate_phone = PhoneNumberField(blank=True, null=True)
-    email = models.EmailField()
-    website = models.URLField(blank=True)
+    phone_number = PhoneNumberField(help_text="Primary contact phone number with country code")
+    alternate_phone = PhoneNumberField(blank=True, null=True, help_text="Secondary contact number (optional)")
+    email = models.EmailField(help_text="Business email address for inquiries")
+    website = models.URLField(blank=True, help_text="Business website URL (include http:// or https://)")
     
     # Business Details
-    established_year = models.PositiveIntegerField(null=True, blank=True)
-    employee_count = models.PositiveIntegerField(null=True, blank=True)
-    annual_turnover = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    established_year = models.PositiveIntegerField(null=True, blank=True, help_text="Year the business was established (e.g., 2020)")
+    employee_count = models.PositiveIntegerField(null=True, blank=True, help_text="Number of employees in the business")
+    annual_turnover = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True, help_text="Annual turnover in INR (optional, for business credibility)")
     
     # Legal Information
-    gst_number = models.CharField(max_length=15, blank=True)
-    pan_number = models.CharField(max_length=10, blank=True)
-    license_number = models.CharField(max_length=50, blank=True)
+    gst_number = models.CharField(max_length=15, blank=True, help_text="15-character GST number (for Indian businesses)")
+    pan_number = models.CharField(max_length=10, blank=True, help_text="10-character PAN number")
+    license_number = models.CharField(max_length=50, blank=True, help_text="Business license or registration number")
     
     # Status and Verification
-    is_active = models.BooleanField(default=True)
-    is_featured = models.BooleanField(default=False)
-    verification_status = models.CharField(max_length=20, choices=VERIFICATION_STATUS, default='pending')
-    verified_at = models.DateTimeField(null=True, blank=True)
-    verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_businesses')
+    is_active = models.BooleanField(default=True, help_text="Whether the business listing is active and visible")
+    is_featured = models.BooleanField(default=False, help_text="Featured businesses appear prominently in search results")
+    verification_status = models.CharField(max_length=20, choices=VERIFICATION_STATUS, default='pending', help_text="Business verification status by admin")
+    verified_at = models.DateTimeField(null=True, blank=True, help_text="Date and time when business was verified")
+    verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_businesses', help_text="Admin user who verified this business")
     
     # Health and Completeness
-    health_status = models.CharField(max_length=20, choices=HEALTH_STATUS, default='average')
-    profile_completeness = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    last_activity_at = models.DateTimeField(null=True, blank=True)
+    health_status = models.CharField(max_length=20, choices=HEALTH_STATUS, default='average', help_text="Overall business profile health score")
+    profile_completeness = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)], help_text="Profile completion percentage (0-100%)")
+    last_activity_at = models.DateTimeField(null=True, blank=True, help_text="Last time the business profile was updated")
     
     # Media
-    logo = models.ImageField(upload_to='businesses/logos/', blank=True, null=True)
-    cover_image = models.ImageField(upload_to='businesses/covers/', blank=True, null=True)
+    logo = models.ImageField(upload_to='businesses/logos/', blank=True, null=True, help_text="Business logo (recommended: 200x200px, square format)")
+    cover_image = models.ImageField(upload_to='businesses/covers/', blank=True, null=True, help_text="Cover image for business profile (recommended: 1200x400px)")
     
     # Working Hours
-    monday_open = models.TimeField(null=True, blank=True)
-    monday_close = models.TimeField(null=True, blank=True)
-    tuesday_open = models.TimeField(null=True, blank=True)
-    tuesday_close = models.TimeField(null=True, blank=True)
-    wednesday_open = models.TimeField(null=True, blank=True)
-    wednesday_close = models.TimeField(null=True, blank=True)
-    thursday_open = models.TimeField(null=True, blank=True)
-    thursday_close = models.TimeField(null=True, blank=True)
-    friday_open = models.TimeField(null=True, blank=True)
-    friday_close = models.TimeField(null=True, blank=True)
-    saturday_open = models.TimeField(null=True, blank=True)
-    saturday_close = models.TimeField(null=True, blank=True)
-    sunday_open = models.TimeField(null=True, blank=True)
-    sunday_close = models.TimeField(null=True, blank=True)
+    monday_open = models.TimeField(null=True, blank=True, help_text="Monday opening time (24-hour format)")
+    monday_close = models.TimeField(null=True, blank=True, help_text="Monday closing time (24-hour format)")
+    tuesday_open = models.TimeField(null=True, blank=True, help_text="Tuesday opening time")
+    tuesday_close = models.TimeField(null=True, blank=True, help_text="Tuesday closing time")
+    wednesday_open = models.TimeField(null=True, blank=True, help_text="Wednesday opening time")
+    wednesday_close = models.TimeField(null=True, blank=True, help_text="Wednesday closing time")
+    thursday_open = models.TimeField(null=True, blank=True, help_text="Thursday opening time")
+    thursday_close = models.TimeField(null=True, blank=True, help_text="Thursday closing time")
+    friday_open = models.TimeField(null=True, blank=True, help_text="Friday opening time")
+    friday_close = models.TimeField(null=True, blank=True, help_text="Friday closing time")
+    saturday_open = models.TimeField(null=True, blank=True, help_text="Saturday opening time")
+    saturday_close = models.TimeField(null=True, blank=True, help_text="Saturday closing time")
+    sunday_open = models.TimeField(null=True, blank=True, help_text="Sunday opening time")
+    sunday_close = models.TimeField(null=True, blank=True, help_text="Sunday closing time")
     
     # Social Media
-    facebook_url = models.URLField(blank=True)
-    instagram_url = models.URLField(blank=True)
-    twitter_url = models.URLField(blank=True)
-    linkedin_url = models.URLField(blank=True)
-    youtube_url = models.URLField(blank=True)
+    facebook_url = models.URLField(blank=True, help_text="Facebook page URL")
+    instagram_url = models.URLField(blank=True, help_text="Instagram profile URL")
+    twitter_url = models.URLField(blank=True, help_text="Twitter/X profile URL")
+    linkedin_url = models.URLField(blank=True, help_text="LinkedIn company page URL")
+    youtube_url = models.URLField(blank=True, help_text="YouTube channel URL")
     
     # Statistics
-    view_count = models.PositiveIntegerField(default=0)
-    inquiry_count = models.PositiveIntegerField(default=0)
-    lead_count = models.PositiveIntegerField(default=0)
-    conversion_count = models.PositiveIntegerField(default=0)
+    view_count = models.PositiveIntegerField(default=0, help_text="Total number of profile views")
+    inquiry_count = models.PositiveIntegerField(default=0, help_text="Total number of inquiries received")
+    lead_count = models.PositiveIntegerField(default=0, help_text="Total number of leads generated")
+    conversion_count = models.PositiveIntegerField(default=0, help_text="Total number of successful conversions")
     
     # Tags
-    tags = TaggableManager(blank=True)
+    tags = TaggableManager(blank=True, help_text="Tags for better discoverability (comma-separated)")
     
     class Meta:
         verbose_name = 'Business'
@@ -228,29 +228,29 @@ class Business(TimeStampedModel, AddressModel, SEOModel):
 class BusinessAnalytics(TimeStampedModel):
     """Daily analytics for businesses."""
     
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='analytics')
-    date = models.DateField()
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='analytics', help_text="Business this analytics data belongs to")
+    date = models.DateField(help_text="Date for this analytics record")
     
     # Traffic metrics
-    page_views = models.PositiveIntegerField(default=0)
-    unique_visitors = models.PositiveIntegerField(default=0)
+    page_views = models.PositiveIntegerField(default=0, help_text="Total page views for this date")
+    unique_visitors = models.PositiveIntegerField(default=0, help_text="Number of unique visitors")
     
     # Engagement metrics
-    inquiries = models.PositiveIntegerField(default=0)
-    leads = models.PositiveIntegerField(default=0)
-    conversions = models.PositiveIntegerField(default=0)
+    inquiries = models.PositiveIntegerField(default=0, help_text="Number of inquiries received")
+    leads = models.PositiveIntegerField(default=0, help_text="Number of leads generated")
+    conversions = models.PositiveIntegerField(default=0, help_text="Number of successful conversions")
     
     # Review metrics
-    new_reviews = models.PositiveIntegerField(default=0)
-    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
+    new_reviews = models.PositiveIntegerField(default=0, help_text="Number of new reviews received")
+    average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0, help_text="Average rating for this date")
     
     # Contact metrics
-    phone_clicks = models.PositiveIntegerField(default=0)
-    email_clicks = models.PositiveIntegerField(default=0)
-    website_clicks = models.PositiveIntegerField(default=0)
+    phone_clicks = models.PositiveIntegerField(default=0, help_text="Number of phone number clicks")
+    email_clicks = models.PositiveIntegerField(default=0, help_text="Number of email clicks")
+    website_clicks = models.PositiveIntegerField(default=0, help_text="Number of website link clicks")
     
     # Social media metrics
-    social_media_clicks = models.PositiveIntegerField(default=0)
+    social_media_clicks = models.PositiveIntegerField(default=0, help_text="Total social media link clicks")
     
     class Meta:
         verbose_name = 'Business Analytics'

@@ -22,24 +22,24 @@ class ReferralProgram(TimeStampedModel):
     )
     
     name = models.CharField(max_length=100)
-    description = models.TextField()
-    program_type = models.CharField(max_length=20, choices=PROGRAM_TYPES)
+    description = models.TextField(help_text="Detailed description of the referral program")
+    program_type = models.CharField(max_length=20, choices=PROGRAM_TYPES, help_text="Type of referral program")
     
     # Reward configuration
-    reward_type = models.CharField(max_length=20, choices=REWARD_TYPES)
-    reward_value = models.DecimalField(max_digits=10, decimal_places=2)
-    max_reward_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    reward_type = models.CharField(max_length=20, choices=REWARD_TYPES, help_text="Type of reward for referred users")
+    reward_value = models.DecimalField(max_digits=10, decimal_places=2, help_text="Reward value (percentage or fixed amount)")
+    max_reward_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Maximum reward amount (for percentage-based rewards)")
     
     # Referrer rewards
-    referrer_reward_type = models.CharField(max_length=20, choices=REWARD_TYPES)
-    referrer_reward_value = models.DecimalField(max_digits=10, decimal_places=2)
-    referrer_max_reward = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    referrer_reward_type = models.CharField(max_length=20, choices=REWARD_TYPES, help_text="Type of reward for referrers")
+    referrer_reward_value = models.DecimalField(max_digits=10, decimal_places=2, help_text="Referrer reward value")
+    referrer_max_reward = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Maximum reward for referrers")
     
     # Program settings
-    is_active = models.BooleanField(default=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField(null=True, blank=True)
-    max_referrals_per_user = models.PositiveIntegerField(null=True, blank=True)
+    is_active = models.BooleanField(default=True, help_text="Whether this program is currently active")
+    start_date = models.DateTimeField(help_text="Program start date")
+    end_date = models.DateTimeField(null=True, blank=True, help_text="Program end date (leave empty for no end date)")
+    max_referrals_per_user = models.PositiveIntegerField(null=True, blank=True, help_text="Maximum referrals per user (leave empty for unlimited)")
     
     class Meta:
         verbose_name = 'Referral Program'

@@ -31,11 +31,11 @@ class NotificationTemplate(TimeStampedModel):
     )
     
     name = models.CharField(max_length=100)
-    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
-    event_type = models.CharField(max_length=30, choices=EVENT_TYPES)
-    subject = models.CharField(max_length=200, help_text="For email notifications")
-    content = models.TextField(help_text="Use {{variable}} for dynamic content")
-    is_active = models.BooleanField(default=True)
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, help_text="Type of notification (email, SMS, push, etc.)")
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPES, help_text="Event that triggers this notification")
+    subject = models.CharField(max_length=200, help_text="Subject line for email notifications (use {{variables}} for dynamic content)")
+    content = models.TextField(help_text="Notification content - use {{variable}} for dynamic content like {{user_name}}, {{business_name}}")
+    is_active = models.BooleanField(default=True, help_text="Whether this template is active and can be used")
     
     class Meta:
         verbose_name = 'Notification Template'
@@ -57,20 +57,20 @@ class Notification(TimeStampedModel):
         ('read', 'Read'),
     )
     
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE)
-    subject = models.CharField(max_length=200)
-    content = models.TextField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', help_text="User who will receive this notification")
+    template = models.ForeignKey(NotificationTemplate, on_delete=models.CASCADE, help_text="Template used to generate this notification")
+    subject = models.CharField(max_length=200, help_text="Processed subject with variables replaced")
+    content = models.TextField(help_text="Processed content with variables replaced")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', help_text="Current delivery status")
     
     # Delivery details
-    sent_at = models.DateTimeField(null=True, blank=True)
-    delivered_at = models.DateTimeField(null=True, blank=True)
-    read_at = models.DateTimeField(null=True, blank=True)
-    failed_reason = models.TextField(blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True, help_text="When the notification was sent")
+    delivered_at = models.DateTimeField(null=True, blank=True, help_text="When the notification was delivered")
+    read_at = models.DateTimeField(null=True, blank=True, help_text="When the notification was read by user")
+    failed_reason = models.TextField(blank=True, help_text="Reason for delivery failure (if any)")
     
     # Additional data
-    data = models.JSONField(default=dict, blank=True)
+    data = models.JSONField(default=dict, blank=True, help_text="Additional data used for generating the notification")
     
     class Meta:
         verbose_name = 'Notification'

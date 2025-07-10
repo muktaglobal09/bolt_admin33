@@ -16,21 +16,21 @@ class Conversation(TimeStampedModel):
     )
     
     # Participants
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_conversations')
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_conversations')
-    business_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='business_user_conversations')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_conversations', help_text="Customer/user in the conversation")
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='business_conversations', help_text="Business involved in the conversation")
+    business_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='business_user_conversations', help_text="Business representative handling the conversation")
     
     # Conversation details
-    subject = models.CharField(max_length=200, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    subject = models.CharField(max_length=200, blank=True, help_text="Conversation subject or topic")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active', help_text="Current status of the conversation")
     
     # Last message info
-    last_message_at = models.DateTimeField(null=True, blank=True)
-    last_message_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='last_messages')
+    last_message_at = models.DateTimeField(null=True, blank=True, help_text="Timestamp of the last message")
+    last_message_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='last_messages', help_text="User who sent the last message")
     
     # Read status
-    user_last_read = models.DateTimeField(null=True, blank=True)
-    business_user_last_read = models.DateTimeField(null=True, blank=True)
+    user_last_read = models.DateTimeField(null=True, blank=True, help_text="Last time the user read messages")
+    business_user_last_read = models.DateTimeField(null=True, blank=True, help_text="Last time the business user read messages")
     
     class Meta:
         verbose_name = 'Conversation'

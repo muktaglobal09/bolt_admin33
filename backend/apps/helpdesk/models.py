@@ -9,10 +9,10 @@ User = get_user_model()
 class TicketCategory(TimeStampedModel):
     """Categories for support tickets."""
     
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True)
-    sort_order = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=100, unique=True, help_text="Category name (e.g., 'Technical Support', 'Billing')")
+    description = models.TextField(blank=True, help_text="Description of what issues this category covers")
+    is_active = models.BooleanField(default=True, help_text="Whether this category is available for new tickets")
+    sort_order = models.PositiveIntegerField(default=0, help_text="Order for displaying categories")
     
     class Meta:
         verbose_name = 'Ticket Category'
@@ -42,29 +42,29 @@ class SupportTicket(TimeStampedModel):
     )
     
     # Ticket Information
-    ticket_number = models.CharField(max_length=20, unique=True)
-    subject = models.CharField(max_length=200)
-    description = models.TextField()
-    category = models.ForeignKey(TicketCategory, on_delete=models.SET_NULL, null=True, blank=True)
-    priority = models.CharField(max_length=10, choices=PRIORITIES, default='medium')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    ticket_number = models.CharField(max_length=20, unique=True, help_text="Auto-generated unique ticket number")
+    subject = models.CharField(max_length=200, help_text="Brief description of the issue")
+    description = models.TextField(help_text="Detailed description of the problem or request")
+    category = models.ForeignKey(TicketCategory, on_delete=models.SET_NULL, null=True, blank=True, help_text="Category that best describes this ticket")
+    priority = models.CharField(max_length=10, choices=PRIORITIES, default='medium', help_text="Priority level for resolution")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open', help_text="Current status of the ticket")
     
     # Requester Information
-    requester = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_tickets')
-    requester_email = models.EmailField()
-    requester_phone = models.CharField(max_length=20, blank=True)
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='support_tickets', null=True, blank=True)
+    requester = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_tickets', help_text="User who created this ticket")
+    requester_email = models.EmailField(help_text="Email address for ticket updates")
+    requester_phone = models.CharField(max_length=20, blank=True, help_text="Phone number for urgent contact")
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='support_tickets', null=True, blank=True, help_text="Business this ticket is related to (if applicable)")
     
     # Assignment
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets')
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets', help_text="Support agent assigned to handle this ticket")
     
     # Resolution
-    resolved_at = models.DateTimeField(null=True, blank=True)
-    resolution_notes = models.TextField(blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True, help_text="Date and time when ticket was resolved")
+    resolution_notes = models.TextField(blank=True, help_text="Notes about how the issue was resolved")
     
     # Customer Satisfaction
-    satisfaction_rating = models.PositiveIntegerField(null=True, blank=True, help_text="1-5 rating")
-    satisfaction_feedback = models.TextField(blank=True)
+    satisfaction_rating = models.PositiveIntegerField(null=True, blank=True, help_text="Customer satisfaction rating (1-5 stars)")
+    satisfaction_feedback = models.TextField(blank=True, help_text="Customer feedback about the support experience")
     
     class Meta:
         verbose_name = 'Support Ticket'

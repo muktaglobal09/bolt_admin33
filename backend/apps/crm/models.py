@@ -80,52 +80,52 @@ class Lead(TimeStampedModel):
     )
     
     # Basic Information
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='crm_leads')
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100, blank=True)
-    email = models.EmailField()
-    phone_number = PhoneNumberField(blank=True, null=True)
-    company = models.CharField(max_length=200, blank=True)
-    designation = models.CharField(max_length=100, blank=True)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='crm_leads', help_text="Business this lead is associated with")
+    first_name = models.CharField(max_length=100, help_text="Lead's first name")
+    last_name = models.CharField(max_length=100, blank=True, help_text="Lead's last name (optional)")
+    email = models.EmailField(help_text="Lead's email address")
+    phone_number = PhoneNumberField(blank=True, null=True, help_text="Lead's contact phone number")
+    company = models.CharField(max_length=200, blank=True, help_text="Lead's company name (if applicable)")
+    designation = models.CharField(max_length=100, blank=True, help_text="Lead's job title or designation")
     
     # Lead Details
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
-    lead_source = models.CharField(max_length=20, choices=LEAD_SOURCES, default='website')
-    priority = models.CharField(max_length=10, choices=PRIORITIES, default='medium')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new', help_text="Current status of the lead")
+    lead_source = models.CharField(max_length=20, choices=LEAD_SOURCES, default='website', help_text="How this lead was acquired")
+    priority = models.CharField(max_length=10, choices=PRIORITIES, default='medium', help_text="Priority level for follow-up")
     
     # Scoring and Qualification
-    lead_score = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    qualification_notes = models.TextField(blank=True)
+    lead_score = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)], help_text="Lead quality score (0-100, auto-calculated)")
+    qualification_notes = models.TextField(blank=True, help_text="Notes about lead qualification and requirements")
     
     # Assignment and Ownership
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='owned_leads')
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_leads')
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='owned_leads', help_text="User who owns this lead")
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_leads', help_text="User assigned to follow up on this lead")
     
     # Campaign and Marketing
-    campaign_name = models.CharField(max_length=200, blank=True)
-    utm_source = models.CharField(max_length=100, blank=True)
-    utm_medium = models.CharField(max_length=100, blank=True)
-    utm_campaign = models.CharField(max_length=100, blank=True)
+    campaign_name = models.CharField(max_length=200, blank=True, help_text="Marketing campaign that generated this lead")
+    utm_source = models.CharField(max_length=100, blank=True, help_text="UTM source parameter")
+    utm_medium = models.CharField(max_length=100, blank=True, help_text="UTM medium parameter")
+    utm_campaign = models.CharField(max_length=100, blank=True, help_text="UTM campaign parameter")
     
     # Contact Information
-    website = models.URLField(blank=True)
-    address = models.TextField(blank=True)
-    city = models.CharField(max_length=100, blank=True)
-    state = models.CharField(max_length=100, blank=True)
-    country = models.CharField(max_length=100, default='India')
+    website = models.URLField(blank=True, help_text="Lead's website or company website")
+    address = models.TextField(blank=True, help_text="Lead's address")
+    city = models.CharField(max_length=100, blank=True, help_text="Lead's city")
+    state = models.CharField(max_length=100, blank=True, help_text="Lead's state")
+    country = models.CharField(max_length=100, default='India', help_text="Lead's country")
     
     # Interaction Tracking
-    last_contacted = models.DateTimeField(null=True, blank=True)
-    next_follow_up = models.DateTimeField(null=True, blank=True)
+    last_contacted = models.DateTimeField(null=True, blank=True, help_text="Last time this lead was contacted")
+    next_follow_up = models.DateTimeField(null=True, blank=True, help_text="Scheduled date for next follow-up")
     
     # Conversion Tracking
-    converted_at = models.DateTimeField(null=True, blank=True)
-    converted_to_contact = models.ForeignKey('CRMContact', on_delete=models.SET_NULL, null=True, blank=True, related_name='converted_from_lead')
-    converted_to_deal = models.ForeignKey('CRMDeal', on_delete=models.SET_NULL, null=True, blank=True, related_name='converted_from_lead')
+    converted_at = models.DateTimeField(null=True, blank=True, help_text="Date when lead was converted")
+    converted_to_contact = models.ForeignKey('CRMContact', on_delete=models.SET_NULL, null=True, blank=True, related_name='converted_from_lead', help_text="Contact created from this lead")
+    converted_to_deal = models.ForeignKey('CRMDeal', on_delete=models.SET_NULL, null=True, blank=True, related_name='converted_from_lead', help_text="Deal created from this lead")
     
     # Additional Information
-    notes = models.TextField(blank=True)
-    tags = TaggableManager(blank=True)
+    notes = models.TextField(blank=True, help_text="Additional notes about the lead")
+    tags = TaggableManager(blank=True, help_text="Tags for categorizing and filtering leads")
     
     class Meta:
         verbose_name = 'Lead'

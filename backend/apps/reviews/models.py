@@ -10,44 +10,44 @@ User = get_user_model()
 class Review(TimeStampedModel):
     """Customer reviews for businesses."""
     
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='reviews', help_text="Business being reviewed")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews', help_text="User who wrote the review")
     rating = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        help_text="Rating from 1 to 5 stars"
+        help_text="Overall rating from 1 to 5 stars"
     )
-    title = models.CharField(max_length=200, blank=True)
-    comment = models.TextField()
+    title = models.CharField(max_length=200, blank=True, help_text="Review title or headline (optional)")
+    comment = models.TextField(help_text="Detailed review comment")
     
     # Review status
-    is_approved = models.BooleanField(default=False)
-    is_featured = models.BooleanField(default=False)
-    approved_at = models.DateTimeField(null=True, blank=True)
+    is_approved = models.BooleanField(default=False, help_text="Whether the review has been approved by admin")
+    is_featured = models.BooleanField(default=False, help_text="Featured reviews are highlighted prominently")
+    approved_at = models.DateTimeField(null=True, blank=True, help_text="Date when review was approved")
     approved_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='approved_reviews'
+        related_name='approved_reviews', help_text="Admin who approved this review"
     )
     
     # Additional fields
     service_quality = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        null=True, blank=True
+        null=True, blank=True, help_text="Service quality rating (1-5 stars)"
     )
     value_for_money = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        null=True, blank=True
+        null=True, blank=True, help_text="Value for money rating (1-5 stars)"
     )
     communication = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        null=True, blank=True
+        null=True, blank=True, help_text="Communication quality rating (1-5 stars)"
     )
     timeliness = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        null=True, blank=True
+        null=True, blank=True, help_text="Timeliness rating (1-5 stars)"
     )
     
     # Verification
-    is_verified_purchase = models.BooleanField(default=False)
+    is_verified_purchase = models.BooleanField(default=False, help_text="Whether this review is from a verified customer")
     
     class Meta:
         verbose_name = 'Review'
@@ -62,10 +62,10 @@ class Review(TimeStampedModel):
 class ReviewReply(TimeStampedModel):
     """Business replies to reviews."""
     
-    review = models.OneToOneField(Review, on_delete=models.CASCADE, related_name='reply')
-    business_user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.TextField()
-    is_approved = models.BooleanField(default=True)
+    review = models.OneToOneField(Review, on_delete=models.CASCADE, related_name='reply', help_text="Review being replied to")
+    business_user = models.ForeignKey(User, on_delete=models.CASCADE, help_text="Business user who wrote the reply")
+    message = models.TextField(help_text="Reply message to the review")
+    is_approved = models.BooleanField(default=True, help_text="Whether the reply is approved and visible")
     
     class Meta:
         verbose_name = 'Review Reply'
@@ -78,9 +78,9 @@ class ReviewReply(TimeStampedModel):
 class ReviewImage(TimeStampedModel):
     """Images attached to reviews."""
     
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='reviews/images/')
-    caption = models.CharField(max_length=255, blank=True)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='images', help_text="Review this image belongs to")
+    image = models.ImageField(upload_to='reviews/images/', help_text="Image file (recommended: max 2MB)")
+    caption = models.CharField(max_length=255, blank=True, help_text="Optional caption for the image")
     
     class Meta:
         verbose_name = 'Review Image'
@@ -93,9 +93,9 @@ class ReviewImage(TimeStampedModel):
 class ReviewHelpful(TimeStampedModel):
     """Track helpful votes for reviews."""
     
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='helpful_votes')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_helpful = models.BooleanField(default=True)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='helpful_votes', help_text="Review being voted on")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, help_text="User who voted")
+    is_helpful = models.BooleanField(default=True, help_text="True for helpful, False for not helpful")
     
     class Meta:
         verbose_name = 'Review Helpful Vote'
@@ -118,16 +118,16 @@ class ReviewReport(TimeStampedModel):
         ('other', 'Other'),
     )
     
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='reports')
-    reported_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    reason = models.CharField(max_length=20, choices=REPORT_REASONS)
-    description = models.TextField(blank=True)
-    is_resolved = models.BooleanField(default=False)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='reports', help_text="Review being reported")
+    reported_by = models.ForeignKey(User, on_delete=models.CASCADE, help_text="User who reported the review")
+    reason = models.CharField(max_length=20, choices=REPORT_REASONS, help_text="Reason for reporting")
+    description = models.TextField(blank=True, help_text="Additional details about the report")
+    is_resolved = models.BooleanField(default=False, help_text="Whether the report has been resolved")
     resolved_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='resolved_reports'
+        related_name='resolved_reports', help_text="Admin who resolved the report"
     )
-    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True, help_text="Date when report was resolved")
     
     class Meta:
         verbose_name = 'Review Report'
